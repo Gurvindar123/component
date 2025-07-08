@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  auth-service:
+    image: maven:3.9.4-eclipse-temurin-17
+    container_name: auth-service
+    working_dir: /app
+    volumes:
+      - ./:/app
+      - ~/.m2:/root/.m2
+    ports:
+      - "7022:8080"
+    command: mvn spring-boot:run
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mariadb://mariadb:3306/authdb
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "true"
+    depends_on:
+      - mariadb
+
+  mariadb:
+    image: mariadb:11
+    container_name: mariadb
+    restart: always
+    ports:
+      - "3301:3306"
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: authdb
+    volumes:
+      - mariadb_data:/var/lib/mysql
+
+volumes:
+  mariadb_data:
